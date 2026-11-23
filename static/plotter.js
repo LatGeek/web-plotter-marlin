@@ -420,11 +420,18 @@ function checkBounds(paths, bounds) {
 }
 
 // ── G-code Generation ──
+// for each command follow:
+// G90 to set absolute coordinate space
+// M400 to wait for queue to exec
+// M280 P0 S${penUpZ} to lift pen / M280 P0 S${penDownZ} to lower pen
+
 
 function generateMoveCommands(x, y, f, penUpZ, zSpeed) {
   return [
     "G90",
-    `G1 Z${penUpZ} F${zSpeed}`,
+    "M400",
+    `M280 P0 S${penUpZ}`,
+    //`G1 Z${penUpZ} F${zSpeed}`,
     `G1 X${x} Y${y} F${f}`,
   ];
 }
@@ -432,11 +439,17 @@ function generateMoveCommands(x, y, f, penUpZ, zSpeed) {
 function generateCircleCommands(x, y, r, f, penUpZ, penDownZ, zSpeed) {
   return [
     "G90",
-    `G1 Z${penUpZ} F${zSpeed}`,
+    "M400",
+    `M280 P0 S${penUpZ}`,
+    //    `G1 Z${penUpZ} F${zSpeed}`,
     `G1 X${x + r} Y${y} F${f}`,
-    `G1 Z${penDownZ} F${zSpeed}`,
+    "M400",
+    `M280 P0 S${penDownZ}`,
+    //    `G1 Z${penDownZ} F${zSpeed}`,
     `G2 X${x + r} Y${y} I${-r} J0 F${f}`,
-    `G1 Z${penUpZ} F${zSpeed}`,
+    "M400",
+    `M280 P0 S${penUpZ}`,
+    //    `G1 Z${penUpZ} F${zSpeed}`,
   ];
 }
 
@@ -450,22 +463,28 @@ function generatePlotCommandsWithMap(paths, speed, penUpZ, penDownZ) {
   const cmds = [];
   const map = [];
 
-  cmds.push("G28");              map.push(null);
-  cmds.push("G90");              map.push(null);
-  cmds.push(`G0 Z${penUpZ}`);   map.push(null);
+  cmds.push(`G28 X Y`); map.push(null);
+  cmds.push("G90"); map.push(null);
+  //  cmds.push(`G0 Z${penUpZ}`);   map.push(null);
+  cmds.push("M400"); map.push(null);
+  cmds.push(`M280 P0 S${penUpZ}`); map.push(null);
 
   for (let p = 0; p < paths.length; p++) {
     const path = paths[p];
     if (path.length < 2) continue;
     cmds.push(`G0 X${path[0].x.toFixed(2)} Y${path[0].y.toFixed(2)}`);
     map.push({ pathIndex: p, pointIndex: 0, type: "travel" });
-    cmds.push(`G0 Z${penDownZ}`);
+    // cmds.push(`G0 Z${penDownZ}`);
+    cmds.push("M400");
+    cmds.push(`M280 P0 S${penDownZ}`);
     map.push({ pathIndex: p, pointIndex: 0, type: "pendown" });
     for (let i = 1; i < path.length; i++) {
       cmds.push(`G1 X${path[i].x.toFixed(2)} Y${path[i].y.toFixed(2)} F${speed}`);
       map.push({ pathIndex: p, pointIndex: i, type: "draw" });
     }
-    cmds.push(`G0 Z${penUpZ}`);
+    //    cmds.push(`G0 Z${penUpZ}`);
+    cmds.push("M400");
+    cmds.push(`M280 P0 S${penUpZ}`);
     map.push({ pathIndex: p, pointIndex: path.length - 1, type: "penup" });
   }
 

@@ -45,14 +45,11 @@
     <span id="serial-cmds" title="Commands per second">0 cmd/s</span>
   </div>
   <div id="quick-bar">
-    <button onclick="send('G28')">Home All</button>
-    <button onclick="send('G28 X')">Home X</button>
-    <button onclick="send('G28 Y')">Home Y</button>
-    <button onclick="send('G28 Z')">Home Z</button>
-    <button onclick="send('M114')">Position</button>
-    <button onclick="send('M105')">Temps</button>
-    <button onclick="send('M84')">Motors Off</button>
-    <button onclick="send('M503')">Settings</button>
+    <button onclick="send('G28 X Y')">Home XY</button>
+    <button onclick="send('M18')">Kill Steppers</button>
+    <button onclick="send('M999')">STOP Restart</button>
+    <button onclick="send('M115')">Capability Report</button>
+    <button onclick="send('M503')">Settings Report</button>
   </div>
   <div id="input-row">
     <input type="text" id="cmd-input" placeholder="Type G-code command..." autocomplete="off" spellcheck="false">
@@ -130,8 +127,8 @@
 
     <div class="panel">
       <h2>Pen Control</h2>
-      <label>Up Z (mm) <input type="number" id="pen-up-z" value="2" min="0" step="0.5"></label>
-      <label>Down Z (mm) <input type="number" id="pen-down-z" value="0" min="0" step="0.1"></label>
+      <label>Up Z (deg) <input type="number" id="pen-up-z" value="60" min="0" step="1"></label>
+      <label>Down Z (deg) <input type="number" id="pen-down-z" value="130" min="0" step="1"></label>
       <label>Z Speed <input type="number" id="pen-z-speed" value="300" min="50" step="50"></label>
       <label>Safe Z (mm) <input type="number" id="pen-safe-z" value="40" min="0" step="5"></label>
       <label>Pen Size (mm) <input type="number" id="pen-size" value="0.5" min="0.1" step="0.1"></label>
@@ -152,8 +149,8 @@
       <button onclick="setSpeed(50)">50%</button>
       <button onclick="setSpeed(75)">75%</button>
       <button class="primary" onclick="setSpeed(100)">100%</button>
-      <button onclick="setSpeed(125)">125%</button>
       <button onclick="setSpeed(150)">150%</button>
+      <button onclick="setSpeed(200)">200%</button>
       <button onclick="applySpeed()">Apply</button>
       <div class="info-text">M220: applies immediately to current and queued moves.</div>
     </div>
