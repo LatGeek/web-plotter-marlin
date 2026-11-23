@@ -242,14 +242,17 @@ async def do_pause(pen_up_z, z_speed):
     pause_event.clear()
     # Lift pen
     await send_gcode("G90")
-    await send_gcode(f"G1 Z{pen_up_z} F{z_speed}")
+    await send_gcode("M400")
+    await send_gcode(f"M280 P0 S{pen_up_z}")
     await broadcast({"type": "paused"})
 
 
 async def do_resume(pen_down_z, z_speed):
     # Lower pen
     await send_gcode("G90")
-    await send_gcode(f"G1 Z{pen_down_z} F{z_speed}")
+    await send_gcode("M400")
+    await send_gcode(f"M280 P0 S{pen_down_z}")
+    # await send_gcode(f"G1 Z{pen_down_z} F{z_speed}")
     await broadcast({"type": "resumed"})
     pause_event.set()
 
